@@ -3,335 +3,1055 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xXSkidMasterXx - EZ Bank Pwned</title>
+    <title>Operation BlackVault - Interactive Attack Simulation</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            background: #0a0a0a;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            padding: 20px;
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 0, 0.03) 2px, rgba(0, 255, 0, 0.03) 4px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            padding: 30px;
-            border: 2px solid #00ff00;
-            margin-bottom: 30px;
-            background: rgba(0, 255, 0, 0.05);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            animation: flicker 3s infinite;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.95; }
-        }
-        
-        h1 {
-            font-size: 2.5em;
-            text-shadow: 0 0 10px #00ff00;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #ff0000;
-            font-size: 1.2em;
-            text-shadow: 0 0 8px #ff0000;
-        }
-        
-        .section {
-            border: 1px solid #00ff00;
             padding: 20px;
-            margin-bottom: 20px;
-            background: rgba(0, 50, 0, 0.3);
         }
-        
-        .section h2 {
-            color: #ff00ff;
-            margin-bottom: 15px;
-            text-shadow: 0 0 8px #ff00ff;
-            border-bottom: 1px dashed #ff00ff;
-            padding-bottom: 5px;
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        
-        .motive-box {
-            background: rgba(255, 0, 0, 0.1);
-            border-left: 4px solid #ff0000;
-            padding: 15px;
-            margin: 10px 0;
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        
-        .timeline {
+
+        .simulation-area {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+            min-height: 600px;
+        }
+
+        .phase-indicator {
             display: flex;
             justify-content: space-between;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .timeline-item {
-            flex: 1;
-            min-width: 250px;
-            border: 1px solid #00ff00;
-            padding: 15px;
-            margin: 5px;
-            background: rgba(0, 255, 0, 0.05);
+            margin-bottom: 40px;
             position: relative;
         }
-        
-        .timeline-item::after {
-            content: '→';
-            position: absolute;
-            right: -20px;
-            top: 50%;
-            font-size: 2em;
-            color: #00ff00;
-        }
-        
-        .timeline-item:last-child::after {
+
+        .phase-indicator::before {
             content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 0;
         }
-        
-        .artifact {
-            background: #1a1a1a;
-            border: 2px solid #ff00ff;
-            padding: 15px;
-            margin: 15px 0;
-            font-size: 0.9em;
+
+        .phase-progress {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            z-index: 1;
+        }
+
+        .phase-step {
             position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
         }
-        
-        .artifact-title {
-            color: #ffff00;
+
+        .phase-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px #ffff00;
+            transition: all 0.3s;
         }
-        
-        .terminal-output {
-            background: #000;
-            border: 1px solid #00ff00;
-            padding: 10px;
-            margin: 10px 0;
+
+        .phase-step.active .phase-circle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+            transform: scale(1.2);
+        }
+
+        .phase-step.completed .phase-circle {
+            background: #00b894;
+            color: white;
+        }
+
+        .phase-label {
             font-size: 0.85em;
+            color: #636e72;
+            font-weight: 600;
         }
-        
-        .defcon {
-            background: rgba(255, 0, 0, 0.2);
-            border: 2px solid #ff0000;
+
+        .scene {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .scene.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hospital-system {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .server-box {
+            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            cursor: default;
+        }
+
+        .server-box.infected {
+            background: linear-gradient(135deg, #d63031 0%, #e17055 100%);
+            animation: pulse 1s infinite;
+        }
+
+        .server-box.locked {
+            background: #2d3436;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .server-box.locked::before {
+            content: '🔒';
+            font-size: 3em;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .email-inbox {
+            background: #f8f9fa;
+            border-radius: 10px;
             padding: 20px;
-            margin-top: 30px;
+            max-width: 700px;
+            margin: 0 auto;
         }
-        
-        .defcon h2 {
-            color: #ff0000;
-            text-shadow: 0 0 10px #ff0000;
+
+        .email-item {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #0984e3;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
-        ul {
-            margin-left: 20px;
-            margin-top: 10px;
+
+        .email-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
-        li {
-            margin: 8px 0;
+
+        .email-item.phishing {
+            border-left-color: #d63031;
         }
-        
-        .blink {
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .email-subject {
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .email-from {
+            color: #636e72;
+            font-size: 0.9em;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 20px auto;
+            display: block;
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .danger-button {
+            background: linear-gradient(135deg, #d63031 0%, #e17055 100%);
+        }
+
+        .ransom-screen {
+            background: #000;
+            color: #00ff00;
+            padding: 40px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            border: 5px solid #d63031;
+            box-shadow: 0 0 30px rgba(214, 48, 49, 0.8);
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            33% { transform: translate(-2px, 2px); }
+            66% { transform: translate(2px, -2px); }
+        }
+
+        .countdown {
+            font-size: 2em;
+            color: #d63031;
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
             animation: blink 1s infinite;
         }
-        
+
         @keyframes blink {
             0%, 50%, 100% { opacity: 1; }
-            25%, 75% { opacity: 0; }
+            25%, 75% { opacity: 0.5; }
         }
-        
-        .impact-stats {
+
+        .log-window {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .log-line {
+            margin: 5px 0;
+            opacity: 0;
+            animation: logAppear 0.3s forwards;
+        }
+
+        @keyframes logAppear {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .danger-box {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
+            gap: 20px;
+            margin: 30px 0;
         }
-        
-        .stat-box {
-            background: rgba(255, 0, 0, 0.2);
-            border: 1px solid #ff0000;
-            padding: 15px;
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
             text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
+
         .stat-number {
-            font-size: 2em;
-            color: #ff0000;
-            text-shadow: 0 0 10px #ff0000;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
-        
-        .ascii-art {
-            font-size: 0.7em;
-            line-height: 1.2;
-            color: #00ff00;
-            text-align: center;
+
+        .defense-section {
+            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            padding: 40px;
+            border-radius: 15px;
+            color: white;
+            margin-top: 40px;
+        }
+
+        .defense-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .defense-card {
+            background: rgba(255,255,255,0.2);
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
             margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d63031 0%, #e17055 100%);
+            transition: width 2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .linkedin-profile {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .profile-info h3 {
+            margin: 0;
+            color: #0077b5;
+        }
+
+        .profile-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .checkbox-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .scene-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .scene-description {
+            text-align: center;
+            color: #636e72;
+            margin-bottom: 30px;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="ascii-art">  
-            </div>
-            <h1>xXHeheXx</h1>
-            <p class="subtitle">💀 EZ BANK = OWNED 💀</p>
-            <p style="color: #00ff00; margin-top: 10px;">l33t h4x0r | status: <span class="blink">ONLINE</span></p>
-        </div>
+        <header>
+            <h1>🔒 Operation BlackVault</h1>
+            <p style="margin-top: 15px; font-size: 1.1em;">Interactive Cybercriminal Ransomware Attack Simulation</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Click through each phase to witness the attack unfold</p>
+        </header>
 
-        <div class="section">
-            <h2>🎯 WHY We DID IT (MOTIVE)</h2>
-            <div class="motive-box">
-                <p><strong>Rep++ | Bragging Rights | Look Cool</strong></p>
-                <p style="margin-top: 10px;">yo so we found this SICK SQL injection tutorial on youtube and wanted to flex on my discord server lmaooo. everyone thinks im a noob but NOW THEY'LL SEE!!! ez bank had weak security and we wanted to prove we could hack a REAL bank (not just practice sites). gonna be LEGEND in the hacker forums 😎🔥</p>
-                <p style="margin-top: 10px; color: #ffff00;">Tools Used: LOIC (downloaded), SQLmap (copy-pasted commands), Metasploit (tutorial mode)</p>
+        <div class="phase-indicator">
+            <div class="phase-progress" id="progress"></div>
+            <div class="phase-step active" id="step1">
+                <div class="phase-circle">1</div>
+                <div class="phase-label">RECON</div>
             </div>
-        </div>
-
-        <div class="section">
-            <h2>⚡ ATTACK TIMELINE</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <h3 style="color: #ffff00;">PHASE 1: RECON</h3>
-                    <p>- Googled "how to hack banks"</p>
-                    <p>- Found EZ Bank login page</p>
-                    <p>- Ran random Nmap commands from tutorial</p>
-                    <p>- Searched "EZ Bank vulnerabilities"</p>
-                    <p style="margin-top: 10px; color: #ff00ff;">Time: 2 hours (mostly watching YouTube)</p>
-                </div>
-                <div class="timeline-item">
-                    <h3 style="color: #ffff00;">PHASE 2: ATTACK</h3>
-                    <p>- Copy-pasted SQLi from GitHub</p>
-                    <p>- Used SQLmap with default settings</p>
-                    <p>- Downloaded LOIC for DDoS</p>
-                    <p>- Spammed login with admin/admin</p>
-                    <p style="margin-top: 10px; color: #ff00ff;">Time: 30 mins (it actually worked lol)</p>
-                </div>
-                <div class="timeline-item">
-                    <h3 style="color: #ffff00;">PHASE 3: IMPACT</h3>
-                    <p>- Defaced login page</p>
-                    <p>- Downloaded customer list</p>
-                    <p>- Posted screenshots everywhere</p>
-                    <p>- Bank offline for 6 hours</p>
-                    <p style="margin-top: 10px; color: #ff00ff;">Result: EPIC FAIL (got caught)</p>
-                </div>
+            <div class="phase-step" id="step2">
+                <div class="phase-circle">2</div>
+                <div class="phase-label">DELIVERY</div>
+            </div>
+            <div class="phase-step" id="step3">
+                <div class="phase-circle">3</div>
+                <div class="phase-label">INFECTION</div>
+            </div>
+            <div class="phase-step" id="step4">
+                <div class="phase-circle">4</div>
+                <div class="phase-label">IMPACT</div>
+            </div>
+            <div class="phase-step" id="step5">
+                <div class="phase-circle">5</div>
+                <div class="phase-label">DEFENSE</div>
             </div>
         </div>
 
-        <div class="section">
-            <h2>💣 ARTIFACTS - PROOF OF SKILLS</h2>
-            
-            <div class="artifact">
-                <div class="artifact-title">📜 ARTIFACT 1: SQLi Command Used (copy-pasted from HackForums)</div>
-                <div class="terminal-output">
-                    <p>$ sqlmap -u "http://ezbank.com/login.php" --dbs --random-agent</p>
-                    <p style="color: #ffff00;">[*] starting sqlmap v1.6...</p>
-                    <p>[*] testing connection to target URL</p>
-                    <p style="color: #00ff00;">[SUCCESS] parameter 'username' appears to be injectable</p>
-                    <p>[*] dumping database contents...</p>
-                    <p style="color: #ff0000;">[INFO] retrieved: customers_db</p>
-                    <p>[INFO] retrieved: 15,432 records</p>
-                    <p style="color: #00ff00;">[+] PWNED! Databases extracted to /home/skidmaster/loot/</p>
-                    <p style="margin-top: 10px; color: #ff00ff;"># LOL this actually worked!! following the tutorial FTW 🎉</p>
+        <div class="simulation-area">
+            <!-- Scene 1: Reconnaissance -->
+            <div class="scene active" id="scene1">
+                <h2 class="scene-title">🔍 Phase 1: Reconnaissance</h2>
+                <p class="scene-description">Cybercriminals research MediCare Hospital Network on LinkedIn to find targets</p>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Attacker's Goal:</strong> Identify IT administrators and collect employee emails for targeted phishing
+                </div>
+
+                <div class="linkedin-profile">
+                    <div class="profile-header">
+                        <div class="profile-pic">SC</div>
+                        <div class="profile-info">
+                            <h3>Sarah Chen</h3>
+                            <p><strong>IT Systems Administrator</strong> at MediCare Hospital Network</p>
+                            <p>📧 sarah.chen@medicare-hospital.org</p>
+                            <p>📍 Healthcare IT | Network Security | 5+ years experience</p>
+                        </div>
+                    </div>
+                    <p style="margin-top: 15px; color: #666;">
+                        "Excited to implement our new patient management system! Working late tonight to ensure smooth deployment across all 4 hospitals. #HealthcareIT #NetworkAdmin"
+                    </p>
+                </div>
+
+                <div class="linkedin-profile">
+                    <div class="profile-header">
+                        <div class="profile-pic">MJ</div>
+                        <div class="profile-info">
+                            <h3>Dr. Michael Johnson</h3>
+                            <p><strong>Chief Medical Officer</strong> at MediCare Hospital Network</p>
+                            <p>📧 m.johnson@medicare-hospital.org</p>
+                            <p>📍 Healthcare Leadership | Patient Care Excellence</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="log-window">
+                    <div class="log-line" style="animation-delay: 0s;">[ATTACKER LOG] Target organization identified: MediCare Hospital Network</div>
+                    <div class="log-line" style="animation-delay: 0.5s;">[ATTACKER LOG] LinkedIn scraping complete: 47 employee profiles collected</div>
+                    <div class="log-line" style="animation-delay: 1s;">[ATTACKER LOG] High-value target found: Sarah Chen (IT Admin)</div>
+                    <div class="log-line" style="animation-delay: 1.5s;">[ATTACKER LOG] Email format identified: firstname.lastname@medicare-hospital.org</div>
+                    <div class="log-line" style="animation-delay: 2s;">[ATTACKER LOG] Target works late hours - optimal for phishing</div>
+                    <div class="log-line" style="animation-delay: 2.5s;">[ATTACKER LOG] Preparing spear-phishing campaign...</div>
+                </div>
+
+                <button class="action-button" onclick="nextScene(2)">🎯 Begin Phishing Attack →</button>
+            </div>
+
+            <!-- Scene 2: Phishing Delivery -->
+            <div class="scene" id="scene2">
+                <h2 class="scene-title">📧 Phase 2: Phishing Email Delivery</h2>
+                <p class="scene-description">Attacker sends convincing phishing email to Sarah Chen's inbox</p>
+
+                <div class="email-inbox">
+                    <h3 style="margin-bottom: 20px; color: #2d3436;">📬 Sarah Chen's Inbox</h3>
+                    
+                    <div class="email-item">
+                        <div class="email-header">
+                            <div>
+                                <div class="email-subject">Q3 Budget Review Meeting</div>
+                                <div class="email-from">From: admin@medicare-hospital.org</div>
+                            </div>
+                            <span style="color: #00b894;">✓ Safe</span>
+                        </div>
+                        <p style="color: #636e72; font-size: 0.9em;">Meeting scheduled for next Tuesday at 2pm...</p>
+                    </div>
+
+                    <div class="email-item phishing" onclick="clickPhishingEmail()">
+                        <div class="email-header">
+                            <div>
+                                <div class="email-subject">🚨 URGENT: Critical Security Update Required</div>
+                                <div class="email-from">From: it-security@medicare-support.com</div>
+                            </div>
+                            <span style="color: #d63031; font-weight: bold;">CLICK TO OPEN</span>
+                        </div>
+                        <p style="color: #636e72; font-size: 0.9em;">Your account has suspicious login attempts. Verify immediately...</p>
+                    </div>
+
+                    <div class="email-item">
+                        <div class="email-header">
+                            <div>
+                                <div class="email-subject">Weekly System Backup Report</div>
+                                <div class="email-from">From: backup-system@medicare-hospital.org</div>
+                            </div>
+                            <span style="color: #00b894;">✓ Safe</span>
+                        </div>
+                        <p style="color: #636e72; font-size: 0.9em;">All backups completed successfully this week...</p>
+                    </div>
+                </div>
+
+                <div class="warning-box" style="margin-top: 30px;">
+                    <strong>🎯 Social Engineering Tactics Used:</strong>
+                    <ul style="margin-top: 10px; line-height: 1.8;">
+                        <li>✓ Urgency: "CRITICAL" and "URGENT" in subject line</li>
+                        <li>✓ Authority: Appears to be from IT Security team</li>
+                        <li>✓ Fear: Claims suspicious login attempts detected</li>
+                        <li>✓ Spoofed Domain: medicare-support.com (not medicare-hospital.org)</li>
+                    </ul>
+                </div>
+
+                <div id="emailOpened" style="display: none;">
+                    <div class="danger-box" style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px;">📧 Email Content:</h3>
+                        <p><strong>Subject:</strong> 🚨 URGENT: Critical Security Update Required</p>
+                        <p style="margin: 15px 0;">Dear Sarah Chen,</p>
+                        <p style="margin: 15px 0;">Our IT Security team has detected <strong style="color: #d63031;">unusual login attempts</strong> on your account from an unrecognized device in Eastern Europe. For your protection, we have temporarily limited your access.</p>
+                        <p style="margin: 15px 0;"><strong style="color: #d63031;">You must verify your identity within 24 hours to restore full access.</strong></p>
+                        <div style="text-align: center; margin: 25px 0;">
+                            <button class="action-button danger-button" onclick="clickMaliciousLink()">
+                                🔐 VERIFY ACCOUNT NOW
+                            </button>
+                        </div>
+                        <p style="font-size: 0.9em; color: #666;">If you do not verify within 24 hours, your account will be permanently suspended.</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="artifact">
-                <div class="artifact-title">🎨 ARTIFACT 2: Defacement Page (my cool design)</div>
-                <div class="terminal-output" style="text-align: center; padding: 20px;">
-                    <p style="font-size: 1.5em; color: #ff0000;">💀💀💀 HACKED BY xXHeheXx 💀💀💀</p>
-                    <p style="margin-top: 15px; color: #00ff00;">ur security = TRASH 🗑️</p>
-                    <p style="margin-top: 10px;">EZ Bank? more like EZ HACK lmaoooo</p>
-                    <p style="margin-top: 15px; color: #ffff00;">Shoutout to:</p>
-                    <p>- DarkWeb_Master69 (taught me SQLi)</p>
-                    <p>- Anonymous (they're so cool)</p>
-                    <p>- My mom (for the internet bill)</p>
-                    <p style="margin-top: 15px; color: #ff00ff;">Follow me on Discord: SkidMaster#1337</p>
-                    <p style="margin-top: 10px; font-size: 0.8em;">PS: im not responsible for damages its just 4 lulz</p>
+            <!-- Scene 3: Infection & Spread -->
+            <div class="scene" id="scene3">
+                <h2 class="scene-title">💣 Phase 3: Ransomware Infection</h2>
+                <p class="scene-description">Sarah clicked the link. Ransomware is now deploying across the hospital network...</p>
+
+                <div class="danger-box">
+                    <strong>⚠️ MALWARE ACTIVE:</strong> BlackVault ransomware v3.2 executing on ADMIN-PC-SC847
                 </div>
+
+                <div class="log-window" id="infectionLog">
+                    <div class="log-line" style="animation-delay: 0s;">[10:35:42] User clicked malicious link - payload downloading...</div>
+                    <div class="log-line" style="animation-delay: 0.5s;">[10:35:48] Malware.exe executed with admin privileges</div>
+                    <div class="log-line" style="animation-delay: 1s;">[10:36:12] Establishing C2 connection to 185.220.101.47 (TOR node)</div>
+                    <div class="log-line" style="animation-delay: 1.5s;">[10:36:34] Scanning network for accessible servers...</div>
+                    <div class="log-line" style="animation-delay: 2s;">[10:36:58] Found 12 accessible servers - beginning lateral movement</div>
+                    <div class="log-line" style="animation-delay: 2.5s;">[10:37:23] Disabling Windows Defender and backup services...</div>
+                    <div class="log-line" style="animation-delay: 3s;">[10:37:45] Encrypting files with AES-256...</div>
+                </div>
+
+                <h3 style="text-align: center; margin: 30px 0; color: #2d3436;">🏥 Hospital Network Status</h3>
+                
+                <div class="hospital-system" id="serverGrid">
+                    <div class="server-box" id="server1">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🖥️</div>
+                        <div>Patient Records</div>
+                        <div style="font-size: 0.9em;">SERVER-01</div>
+                    </div>
+                    <div class="server-box" id="server2">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💾</div>
+                        <div>Medical Imaging</div>
+                        <div style="font-size: 0.9em;">SERVER-02</div>
+                    </div>
+                    <div class="server-box" id="server3">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📊</div>
+                        <div>Billing System</div>
+                        <div style="font-size: 0.9em;">SERVER-03</div>
+                    </div>
+                    <div class="server-box" id="server4">
+                        <div style="font-size: 2em; margin-bottom: 10px;">👥</div>
+                        <div>HR & Payroll</div>
+                        <div style="font-size: 0.9em;">SERVER-04</div>
+                    </div>
+                    <div class="server-box" id="server5">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💊</div>
+                        <div>Pharmacy Database</div>
+                        <div style="font-size: 0.9em;">SERVER-05</div>
+                    </div>
+                    <div class="server-box" id="server6">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🔄</div>
+                        <div>Backup Server</div>
+                        <div style="font-size: 0.9em;">BACKUP-01</div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="encryptProgress">0%</div>
+                </div>
+
+                <button class="action-button danger-button" onclick="startEncryption()">
+                    ⚠️ Watch Encryption Process
+                </button>
+
+                <button class="action-button" onclick="nextScene(4)" id="continueToImpact" style="display: none;">
+                    💥 View Attack Impact →
+                </button>
             </div>
 
-            <div class="artifact">
-                <div class="artifact-title">📊 ARTIFACT 3: Brag Card for Discord (screenshot I posted)</div>
-                <div class="terminal-output" style="background: #1a0033; border-color: #ff00ff;">
-                    <p style="color: #ff00ff; font-size: 1.2em; text-align: center;">🏆 ACHIEVEMENT UNLOCKED 🏆</p>
-                    <p style="text-align: center; margin-top: 10px; color: #ffff00;">═══════════════════════════════</p>
-                    <p style="margin-top: 15px;"><strong style="color: #00ff00;">Target:</strong> EZ Bank Financial Corp</p>
-                    <p><strong style="color: #00ff00;">Method:</strong> SQL Injection + DDoS</p>
-                    <p><strong style="color: #00ff00;">Data Stolen:</strong> 15,432 customer records</p>
-                    <p><strong style="color: #00ff00;">Downtime Caused:</strong> 6 hours</p>
-                    <p><strong style="color: #00ff00;">Difficulty:</strong> ⭐⭐ (easy mode lol)</p>
-                    <p style="margin-top: 15px; color: #ff0000;"><strong>Street Cred:</strong> +9999</p>
-                    <p style="margin-top: 10px; text-align: center;">════════════════════════════════</p>
-                    <p style="margin-top: 10px; text-align: center; color: #ffff00;">yall doubted me but WHO'S LAUGHING NOW 😂🔥</p>
-                    <p style="margin-top: 5px; text-align: center; font-size: 0.8em;">Posted in: #hacking-wins | Likes: 3 | Reactions: 🔥🔥💀</p>
-                </div>
-            </div>
-        </div>
+            <!-- Scene 4: Impact & Ransom -->
+            <div class="scene" id="scene4">
+                <h2 class="scene-title">💥 Phase 4: Attack Impact & Ransom Demand</h2>
+                
+                <div class="ransom-screen">
+                    <pre style="color: #00ff00; text-align: center; font-size: 1.2em; margin-bottom: 20px;">
+╔═══════════════════════════════════════╗
+║  🔒 YOUR FILES ARE ENCRYPTED 🔒      ║
+║       BLACKVAULT RANSOMWARE          ║
+╚═══════════════════════════════════════╝
+</pre>
+                    <div style="color: #ff0000; text-align: center; margin: 30px 0;">
+                        <div style="font-size: 1.5em; margin-bottom: 10px;">⚠️ ALL HOSPITAL SYSTEMS LOCKED ⚠️</div>
+                        <div class="countdown">⏰ TIME REMAINING: 71:45:23</div>
+                    </div>
+                    
+                    <pre style="line-height: 1.8;">
+ATTENTION MEDICARE HOSPITAL NETWORK:
 
-        <div class="section">
-            <h2>💥 IMPACT (SO WHAT?)</h2>
-            <div class="impact-stats">
-                <div class="stat-box">
-                    <div class="stat-number">15,432</div>
-                    <p>Customer Records Exposed</p>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">6 hrs</div>
-                    <p>Bank Downtime</p>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">$2.3M</div>
-                    <p>Estimated Damages</p>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">100%</div>
-                    <p>Chance of Getting Caught</p>
-                </div>
-            </div>
-            <div class="motive-box" style="margin-top: 20px;">
-                <p><strong>⚠️ What Actually Happened:</strong></p>
-                <p style="margin-top: 10px;">Used automated tools without understanding them. Left digital fingerprints EVERYWHERE (real IP, Discord username, bragged publicly). Got traced in 48 hours. Facing cybercrime charges. Parents are FURIOUS. "I'm not a real hacker" - prosecutors. Ruined my future for internet points. NOT WORTH IT.</p>
-            </div>
-        </div>
+✗ 15,000+ patient medical records - ENCRYPTED
+✗ All medical imaging (MRI/CT/X-Ray) - ENCRYPTED  
+✗ Billing & financial systems - ENCRYPTED
+✗ Pharmacy prescription database - ENCRYPTED
+✗ HR and payroll systems - ENCRYPTED
+✗ Backup servers - ENCRYPTED
 
-        <div class="defcon">
-            <h2>🛡️ DEFENDER'S COUNTERMEASURES</h2>
-            <p style="color: #ffff00; margin-bottom: 15px;"><strong>How EZ Bank Could Have Stopped This Script Kiddie:</strong></p>
-            <ul>
-                <li><strong>Input Validation & Parameterized Queries:</strong> Prevent SQL injection attacks by sanitizing all user inputs and using prepared statements</li>
-                <li><strong>Rate Limiting & CAPTCHA:</strong> Block automated login attempts and brute force attacks with rate limits and bot detection</li>
-                <li><strong>Web Application Firewall (WAF):</strong> Detect and block common attack patterns (SQLi, XSS) before they reach the application</li>
-                <li><strong>DDoS Protection:</strong> Use Cloudflare or similar services to mitigate volumetric attacks from LOIC and similar tools</li>
-                <li><strong>Security Awareness & Patch Management:</strong> Regularly update systems and conduct penetration testing to find vulnerabilities before script kiddies do</li>
-                <li><strong>Monitoring & Logging:</strong> Detect suspicious activities quickly with SIEM tools - would have caught this attack in minutes, not hours</li>
-            </ul>
-            <p style="margin-top: 20px; color: #ff0000; text-align: center; font-size: 1.1em;">⚠️ SCRIPT KIDDIES: High Noise, Low Skill, Easy to Catch ⚠️</p>
-        </div>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        <div class="section" style="text-align: center; margin-top: 30px; background: rgba(255, 0, 0, 0.1);">
-            <p style="color: #ff0000; font-size: 1.2em;">⚖️ THIS IS A FICTIONAL EDUCATIONAL REPRESENTATION ⚖️</p>
-            <p style="margin-top: 10px; color: #ffff00;">No real hacking techniques or exploits are provided.</p>
-            <p style="color: #00ff00;">Created for cybersecurity awareness purposes only.</p>
+💰 RANSOM: $2,500,000 USD (Bitcoin only)
+
+⏰ PAYMENT DEADLINE: 72 hours
+   After 72hrs → Price DOUBLES to $5,000,000
+   After 7 days → Decryption keys DELETED
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ DOUBLE EXTORTION WARNING ⚠️
+
+We have stolen 450GB of sensitive data:
+• Patient SSNs and medical histories
+• Insurance information  
+• Financial records
+• Employee personal data
+
+If not paid, data will be:
+→ Leaked publicly
+→ Sold on dark web
+→ Sent to news media
+
+HIPAA violations will cost you MILLIONS more.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Bitcoin Address:
+1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+
+Contact: blackvault@darkweb-mail.onion
+</pre>
+                </div>
+
+                <h3 style="text-align: center; margin: 40px 0 20px; color: #2d3436;">📊 Real-World Impact</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">450+</div>
+                        <div>Files Encrypted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">72hrs</div>
+                        <div>System Downtime</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">15K</div>
+                        <div>Patient Records Locked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$8.2M</div>
+                        <div>Operational Losses</div>
+                    </div>
+                </div>
+
+                <div class="danger-box" style="margin: 30px 0;">
+                    <h3 style="margin-bottom: 15px;">🚨 Immediate Consequences:</h3>
+                    <ul style="line-height: 2;">
+                        <li>🚑 Emergency patients diverted to other facilities</li>
+                        <li>🏥 All non-critical surgeries postponed for 3 days</li>
+                        <li>📋 Doctors forced to use paper records manually</li>
+                        <li>💊 Pharmacy unable to access prescription histories</li>
+                        <li>⚖️ Potential HIPAA violations and massive lawsuits</li>
+                        <li>📰 National news coverage - reputation destroyed</li>
+                    </ul>
+                </div>
+
+                <button class="action-button" onclick="nextScene(5)">
+                    🛡️ Deploy Countermeasures →
+                </button>
+            </div>
+
+            <!-- Scene 5: Defense -->
+            <div class="scene" id="scene5">
+                <h2 class="scene-title">🛡️ Phase 5: Defender's Countermeasures</h2>
+                <p class="scene-description">How could this attack have been prevented? Check each defense mechanism:</p>
+
+                <div class="success-box">
+                    <strong>✅ Attack Analysis Complete!</strong> Now let's learn how to defend against cybercriminals.
+                </div>
+
+                <div style="background: white; padding: 30px; border-radius: 10px; margin: 30px 0;">
+                    <h3 style="margin-bottom: 20px; color: #667eea;">Critical Defense Strategies:</h3>
+                    
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def1" onchange="checkDefense(1)">
+                        <div>
+                            <strong>1. Security Awareness Training</strong>
+                            <p style="color: #666; margin-top: 5px;">Regular phishing simulations and training would have helped Sarah identify the fake email. Employees are the first line of defense.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def2" onchange="checkDefense(2)">
+                        <div>
+                            <strong>2. Multi-Factor Authentication (MFA)</strong>
+                            <p style="color: #666; margin-top: 5px;">Even if Sarah clicked the link, MFA would have prevented attackers from accessing systems with stolen credentials.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def3" onchange="checkDefense(3)">
+                        <div>
+                            <strong>3. Regular Offline Backups</strong>
+                            <p style="color: #666; margin-top: 5px;">Air-gapped backups (physically disconnected from network) allow recovery without paying ransom. Test backups regularly!</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def4" onchange="checkDefense(4)">
+                        <div>
+                            <strong>4. Network Segmentation</strong>
+                            <p style="color: #666; margin-top: 5px;">Isolating critical systems limits ransomware spread. If Sarah's PC was segmented, servers wouldn't be affected.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def5" onchange="checkDefense(5)">
+                        <div>
+                            <strong>5. Endpoint Detection & Response (EDR)</strong>
+                            <p style="color: #666; margin-top: 5px;">EDR tools detect and block ransomware behavior in real-time, stopping encryption before it starts.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def6" onchange="checkDefense(6)">
+                        <div>
+                            <strong>6. Email Security Filters</strong>
+                            <p style="color: #666; margin-top: 5px;">Advanced filters detect spoofed domains and malicious links, blocking phishing emails before they reach inboxes.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="def7" onchange="checkDefense(7)">
+                        <div>
+                            <strong>7. Incident Response Plan</strong>
+                            <p style="color: #666; margin-top: 5px;">Pre-planned response procedures minimize damage and recovery time when attacks occur.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="completionMessage" style="display: none;">
+                    <div class="success-box" style="text-align: center; font-size: 1.2em;">
+                        <h3 style="margin-bottom: 15px;">🎓 Simulation Complete!</h3>
+                        <p>You've witnessed a complete cybercriminal ransomware attack lifecycle.</p>
+                        <p style="margin-top: 15px;"><strong>Key Takeaway:</strong> Cybercriminals are motivated by financial gain and use social engineering + technical exploits to maximize profit. Defense requires multiple layers of security!</p>
+                    </div>
+                </div>
+
+                <div class="defense-section" style="margin-top: 40px;">
+                    <h2 style="text-align: center; margin-bottom: 30px;">📋 Attack Summary</h2>
+                    <div class="defense-grid">
+                        <div class="defense-card">
+                            <h3>💰 MOTIVE</h3>
+                            <p>Pure financial gain - $2.5M Bitcoin ransom + potential data sale on dark web</p>
+                        </div>
+                        <div class="defense-card">
+                            <h3>🎯 TACTICS</h3>
+                            <p>Spear-phishing → Credential theft → Ransomware deployment → Double extortion</p>
+                        </div>
+                        <div class="defense-card">
+                            <h3>🏢 TARGET</h3>
+                            <p>MediCare Hospital Network - chosen for critical operations and weak security</p>
+                        </div>
+                        <div class="defense-card">
+                            <h3>💥 IMPACT</h3>
+                            <p>72hr downtime, $8.2M losses, 15K patient records locked, reputation damage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="action-button" onclick="restartSimulation()" style="margin-top: 30px;">
+                    🔄 Restart Simulation
+                </button>
+            </div>
         </div>
     </div>
+
+    <script>
+        let currentScene = 1;
+        let defenseCount = 0;
+
+        function nextScene(sceneNum) {
+            // Hide current scene
+            document.getElementById('scene' + currentScene).classList.remove('active');
+            
+            // Show next scene
+            document.getElementById('scene' + sceneNum).classList.add('active');
+            
+            // Update phase indicator
+            document.getElementById('step' + currentScene).classList.remove('active');
+            document.getElementById('step' + currentScene).classList.add('completed');
+            document.getElementById('step' + sceneNum).classList.add('active');
+            
+            // Update progress bar
+            let progress = ((sceneNum - 1) / 4) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            currentScene = sceneNum;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clickPhishingEmail() {
+            document.getElementById('emailOpened').style.display = 'block';
+            
+            // Add log entry
+            setTimeout(() => {
+                alert('⚠️ Sarah opened the suspicious email! This is how most ransomware attacks begin - through social engineering.');
+            }, 500);
+        }
+
+        function clickMaliciousLink() {
+            alert('🚨 MALWARE DOWNLOADED! Sarah clicked the malicious link. Ransomware is now executing...');
+            setTimeout(() => {
+                nextScene(3);
+            }, 1000);
+        }
+
+        let encryptionStarted = false;
+
+        function startEncryption() {
+            if (encryptionStarted) return;
+            encryptionStarted = true;
+
+            let progress = 0;
+            let servers = ['server1', 'server2', 'server3', 'server4', 'server5', 'server6'];
+            let currentServer = 0;
+
+            const progressBar = document.getElementById('encryptProgress');
+            const logWindow = document.getElementById('infectionLog');
+
+            const interval = setInterval(() => {
+                progress += 2;
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '% Encrypted';
+
+                // Infect servers progressively
+                if (progress >= (currentServer + 1) * 16 && currentServer < servers.length) {
+                    const serverElement = document.getElementById(servers[currentServer]);
+                    serverElement.classList.add('infected');
+                    
+                    // Add log entry
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-line';
+                    logEntry.textContent = `[10:${37 + currentServer}:${12 + currentServer * 5}] ${servers[currentServer].toUpperCase()} - Encryption in progress...`;
+                    logWindow.appendChild(logEntry);
+                    
+                    setTimeout(() => {
+                        serverElement.classList.remove('infected');
+                        serverElement.classList.add('locked');
+                        serverElement.innerHTML = '🔒<br><span style="font-size: 0.7em;">ENCRYPTED</span>';
+                    }, 1000);
+                    
+                    currentServer++;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = '100% - ALL FILES ENCRYPTED';
+                    
+                    const finalLog = document.createElement('div');
+                    finalLog.className = 'log-line';
+                    finalLog.style.color = '#ff0000';
+                    finalLog.textContent = '[10:42:34] ENCRYPTION COMPLETE - Ransom note deployed';
+                    logWindow.appendChild(finalLog);
+                    
+                    setTimeout(() => {
+                        alert('💥 ATTACK COMPLETE! All hospital systems are now encrypted. The ransom demand has been displayed on every computer.');
+                        document.getElementById('continueToImpact').style.display = 'block';
+                    }, 1500);
+                }
+            }, 100);
+        }
+
+        function checkDefense(num) {
+            const checkbox = document.getElementById('def' + num);
+            if (checkbox.checked) {
+                defenseCount++;
+                if (defenseCount >= 7) {
+                    document.getElementById('completionMessage').style.display = 'block';
+                    document.getElementById('completionMessage').scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                defenseCount--;
+                if (defenseCount < 7) {
+                    document.getElementById('completionMessage').style.display = 'none';
+                }
+            }
+        }
+
+        function restartSimulation() {
+            // Reset all scenes
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('scene' + i).classList.remove('active');
+                document.getElementById('step' + i).classList.remove('active', 'completed');
+            }
+            
+            // Reset to scene 1
+            document.getElementById('scene1').classList.add('active');
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('progress').style.width = '0%';
+            currentScene = 1;
+            
+            // Reset scene 2
+            document.getElementById('emailOpened').style.display = 'none';
+            
+            // Reset scene 3
+            encryptionStarted = false;
+            document.getElementById('encryptProgress').style.width = '0%';
+            document.getElementById('encryptProgress').textContent = '0%';
+            document.getElementById('continueToImpact').style.display = 'none';
+            
+            const servers = ['server1', 'server2', 'server3', 'server4', 'server5', 'server6'];
+            servers.forEach((id, index) => {
+                const serverElement = document.getElementById(id);
+                serverElement.classList.remove('infected', 'locked');
+                const labels = ['Patient Records', 'Medical Imaging', 'Billing System', 'HR & Payroll', 'Pharmacy Database', 'Backup Server'];
+                const serverNums = ['SERVER-01', 'SERVER-02', 'SERVER-03', 'SERVER-04', 'SERVER-05', 'BACKUP-01'];
+                const icons = ['🖥️', '💾', '📊', '👥', '💊', '🔄'];
+                serverElement.innerHTML = `<div style="font-size: 2em; margin-bottom: 10px;">${icons[index]}</div><div>${labels[index]}</div><div style="font-size: 0.9em;">${serverNums[index]}</div>`;
+            });
+            
+            // Reset log
+            const logWindow = document.getElementById('infectionLog');
+            logWindow.innerHTML = `
+                <div class="log-line" style="animation-delay: 0s;">[10:35:42] User clicked malicious link - payload downloading...</div>
+                <div class="log-line" style="animation-delay: 0.5s;">[10:35:48] Malware.exe executed with admin privileges</div>
+                <div class="log-line" style="animation-delay: 1s;">[10:36:12] Establishing C2 connection to 185.220.101.47 (TOR node)</div>
+                <div class="log-line" style="animation-delay: 1.5s;">[10:36:34] Scanning network for accessible servers...</div>
+                <div class="log-line" style="animation-delay: 2s;">[10:36:58] Found 12 accessible servers - beginning lateral movement</div>
+                <div class="log-line" style="animation-delay: 2.5s;">[10:37:23] Disabling Windows Defender and backup services...</div>
+                <div class="log-line" style="animation-delay: 3s;">[10:37:45] Encrypting files with AES-256...</div>
+            `;
+            
+            // Reset scene 5
+            for (let i = 1; i <= 7; i++) {
+                document.getElementById('def' + i).checked = false;
+            }
+            defenseCount = 0;
+            document.getElementById('completionMessage').style.display = 'none';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
